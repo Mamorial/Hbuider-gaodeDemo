@@ -1,0 +1,73 @@
+<script src="../../js/headHtml.js" type="text/javascript" charset="utf-8"></script>
+	<div id="stationInfo">
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <h1 class="mui-title">{{stationTitle}}</h1>
+		</header>
+		<div id="container" style="height: 500px;"></div>
+	</div>
+<script src="../../js/foot.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	var app = new Vue({
+		el: "#stationInfo",
+		data: {
+			stationTitle: '',
+			map: '',
+			marker: '',
+			infoWindow: ''
+		},
+		mounted() {
+			var self = this,
+			_location = localStorage.getItem('nearState');
+		    _location = JSON.parse(_location);
+		    var lnglatXY = [_location.lng, _location.lat]; //已知点坐标;
+			self.map = new AMap.Map("container", {
+		        resizeEnable: true,
+		        center: lnglatXY,
+		        zoom: 13
+		    });
+			mui.plusReady(function() {
+				var _info = plus.webview.currentWebview().name;
+				console.log(_info.name);
+				self.stationTitle = _info.name;
+				self.init(_info);
+			});
+
+		},
+		methods: {
+			init: function(info) {
+				var self = this;
+//				var placeSearch = new AMap.PlaceSearch();
+				var _location = [info.location.lng, info.location.lat];
+				var busNum = info.bus;
+				console.log(busNum);
+
+				AMapUI.loadUI(['overlay/SimpleInfoWindow'], function(SimpleInfoWindow) {
+
+			        self.marker = new AMap.Marker({
+			            map: self.map,
+			            zIndex: 9999999,
+			            position: _location
+			        });
+
+			        self.infoWindow = new SimpleInfoWindow({
+
+			            infoTitle: '<strong>' + self.stationTitle +'</strong>',
+			            infoBody: '<p class="my-desc"><strong>经过的公交线路</strong> <br/>' + busNum,
+			            //基点指向marker的头部位置
+			            offset: new AMap.Pixel(0, -31)
+			        });
+			        //marker 点击时打开
+			        AMap.event.addListener(self.marker, 'click', function() {
+			            self.openInfoWin();
+			        });
+
+			        self.openInfoWin();
+			    });
+			},
+			openInfoWin: function() {
+				this.infoWindow.open(this.map, this.marker.getPosition());
+			}
+		}
+	})
+</script>

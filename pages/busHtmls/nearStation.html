@@ -1,0 +1,78 @@
+<script src="../../js/headHtml.js" type="text/javascript" charset="utf-8"></script>
+	<div id="nearStation">
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <h1 class="mui-title">附近的站点</h1>
+		</header>
+		<div class="mui-content">
+			<ul class="mui-table-view mui-table-view-chevron">
+				<li class="mui-table-view-cell" v-for="item in items" >
+					<a @click="stationbusInfo(item)" class="mui-navigate-right">{{item.name}}</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+<script src="../../js/foot.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	var app = new Vue({
+		el: '#nearStation',
+		data: {
+			items: [],
+			map: ''
+		},
+		mounted() {
+			var _location = localStorage.getItem('nearState');
+			    _location = JSON.parse(_location);
+		    var lnglatXY = [_location.lng, _location.lat];
+		    console.log(lnglatXY);
+		    this.init();
+		},
+		methods: {
+			init: function() {
+				var self = this;
+				AMap.service(["AMap.PlaceSearch"], function() {
+			        var placeSearch = new AMap.PlaceSearch({ //构造地点查询类
+			            pageSize: 5,
+			            type: '公交',
+			            pageIndex: 1,
+			            city: "宁波", //城市
+			            map: self.map
+			        });
+					var _location = localStorage.getItem('nearState');
+				    _location = JSON.parse(_location);
+				    var lnglatXY = [_location.lng, _location.lat]; //已知点坐标
+			        var cpoint = [121.535213,29.877428]; //中心点坐标
+			        placeSearch.searchNearBy('', lnglatXY, 500, function(status, result) {
+						console.log(result);
+						var _name = result.poiList.pois;
+						for(var i = 0; i < _name.length; i++) {
+							var obj = {};
+							obj.bus = _name[i].address;
+							obj.name = _name[i].name;
+							obj.location = _name[i].location;
+							self.items.push(obj);
+						}
+			        });
+			    });
+			},
+			stationbusInfo: function(info) {
+				var self = this,
+					_url = 'stationBus.html';
+				mui.openWindow({
+					url: _url,
+					id: info.name,
+					show: {
+						duration: 300
+					},
+					waiting: {
+						autoshow: false,
+						title: '正在加载...'
+					},
+					extras: {
+						name: info
+					}
+				})
+			}
+		}
+	})
+</script>

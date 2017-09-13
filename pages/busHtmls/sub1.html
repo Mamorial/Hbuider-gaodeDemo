@@ -1,0 +1,81 @@
+<script src="../../js/headHtml.js" type="text/javascript" charset="utf-8"></script>
+	<header class="mui-bar mui-bar-nav index-searchNav">
+	    <div class="index-header">
+	    	<div class="index-header-top">
+	    		<div class="mui-input-row mui-search index-searchInput">
+	    			<div class="index-search" id="search">
+	    				<div class="index-search-L">
+	    					<span class="mui-icon mui-icon-search index-searchIcon"></span>
+	    				</div>
+	    				<div class="index-search-R">
+	    					<span>搜索公交线路、车站、地点</span>
+	    				</div>
+	    			</div>
+				</div>
+				<div class="index-header-topMsg">
+
+					<span class="mui-icon mui-icon-email index-top-email"><span class="index-msg"></span></span>
+
+				</div>
+	    	</div>
+	    </div>
+	</header>
+	<div class="mui-content"></div>
+<script src="../../js/foot.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	mui('.index-searchInput').on('tap', '.index-search', function(e) {
+		var id = this.getAttribute('id');
+		mui.openWindow({
+			url: 'search.html',
+			id: id,
+			show: {
+				duration: 300
+			},
+			waiting: {
+				autoshow: false,
+				title: '正在加载...'
+			},
+			extras: {
+				name: 'id'
+			}
+		})
+	})
+	mui.init({
+		gestureConfig:{
+			doubletap:true
+		},
+		subpages:[{
+			url:'sub1-1.html',
+			id:'sub1-1.html',
+			styles:{
+				top: '150px',
+				bottom: '0px',
+			}
+		}],
+		//预加载
+		preloadPages: [{
+			url: 'search.html',
+			id: 'search'
+		},{
+			url: 'nearStation.html',
+			id: 'nearStation'
+		},{
+			url: 'searchBusRoute.html',
+			id: 'searchBusRoute'
+		},{
+			url: 'erweima.html',
+			id: 'erweima'
+		},{
+			url: 'erweimaS.html',
+			id: 'erweimaS'
+		}]
+	});
+
+	var contentWebview = null;
+	document.querySelector('header').addEventListener('doubletap',function () {
+		if(contentWebview==null){
+			contentWebview = plus.webview.currentWebview().children()[0];
+		}
+		contentWebview.evalJS("mui('#pullrefresh').pullRefresh().scrollTo(0,0,100)");
+	});
+</script>

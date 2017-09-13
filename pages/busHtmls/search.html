@@ -1,0 +1,186 @@
+<script src="../../js/headHtml.js" type="text/javascript" charset="utf-8"></script>
+	<div id="busNum">
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			    <div class="mui-input-row sub-searchInput">
+			        <input type="text" v-model="search_input" id="keyword" name="keyword" autofocus="autofocus" class="mui-input-clear" placeholder="请输入内容" @input="busInfos" />
+			    </div>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-businfo" v-if="busInfoshow">
+				<div class="title">
+					线路
+				</div>
+				<ul class="mui-table-view">
+					 <li class="mui-table-view-cell" v-for="item in itemsBus" @click="busNumInfo(item.name)">
+					 	<span class="mui-icon mui-icon-location"></span>
+					 	{{item.name}}
+					 </li>
+					 <li class="mui-table-view-cell" @click="bus_placeMore('bus')">{{busMoreTip?'查看更多':'无'}}</li>
+				</ul>
+				<div class="title">
+					地方
+				</div>
+				<ul class="mui-table-view">
+					 <li class="mui-table-view-cell" v-for="item in itemsPlace" @click="busNumInfo(item.name)">
+					 	<span class="mui-icon mui-icon-location"></span>
+					 	{{item.name}}
+					 </li>
+					 <li class="mui-table-view-cell" @click="bus_placeMore('place')">{{placeMoreTip?'查看更多':'无'}}</li>
+				</ul>
+			</div>
+			<div class="mui-content-noinfo" v-else>
+				可以搜索公交
+			</div>
+		</div>
+	</div>
+<script src="../../js/foot.js" type="text/javascript" charset="utf-8"></script>
+<style type="text/css">
+	/*地图输入提示隐藏*/
+.amap-sug-result{
+	height: 0!important;
+	overflow: hidden!important;
+	border: none!important;
+}
+</style>
+<script type="text/javascript">
+	var app = new Vue({
+		el: '#busNum',
+		data: {
+			itemsBus: [],
+			itemsPlace: [],
+			search_input: '',
+			busMoreTip: true,
+			placeMoreTip: true,
+			busInfoshow: false,
+			nativeWebview: '',
+			imm: '',
+			InputMethodManager: '',
+			content: ''
+
+		},
+		mounted() {
+			var self = this;
+			mui.init({
+				swipeBack: true //启用右滑关闭功能
+			});
+			mui.plusReady(function() {
+//				self.initNativeObjects();
+//				self.showSoftInput();
+			});
+		},
+		methods: {
+			busNumInfo: function(bus) {
+				mui.openWindow({
+					url: 'busRoute.html',
+					id: 'busRoute',
+					show: {
+						duration: 300
+					},
+					waiting: {
+						autoshow: false,
+						title: '正在加载...'
+					},
+					extras: {
+						name: bus
+					}
+				})
+			},
+			initNativeObjects: function() {   //调起手机键盘
+				var self = this;
+				if (mui.os.android) {
+					var main = plus.android.runtimeMainActivity();
+					var Context = plus.android.importClass("android.content.Context");
+					InputMethodManager = plus.android.importClass("android.view.inputmethod.InputMethodManager");
+					self.imm = main.getSystemService(Context.INPUT_METHOD_SERVICE);
+				} else {
+					self.nativeWebview = plus.webview.currentWebview().nativeInstanceObject();
+				}
+			},
+			showSoftInput: function() {
+				var self = this;
+				if (mui.os.android) {
+					self.imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+				} else {
+					self.nativeWebview.plusCallMethod({
+						"setKeyboardDisplayRequiresUserAction": false
+					});
+				}
+				setTimeout(function() {
+					var inputElem = document.querySelector('input');
+					inputElem.focus();
+					inputElem.parentNode.classList.add('mui-active'); //第一个是search，加上激活样式
+				}, 200);
+			},
+			busInfos: function() {
+				var self = this,
+					keywords = self.search_input,
+					_url;
+				_url = "v3/assistant/inputtips?key=e00e7ed74876f674fa2f01bf36f429c8&keywords="+keywords+"&city=宁波&datatype=all&citylimit=true";
+				if(!keywords) {
+					self.busInfoshow = false;
+				} else {
+					self.busInfoshow = true;
+				}
+				self.itemsBus = [];
+				self.itemsPlace = [];
+				fc.ajax(_url, 'get').done(function(data) {
+					console.log(data.tips.length);
+					data.tips.forEach(function(v, i, a) {
+						if(v.typecode == "999901" || v.typecode == "999905") {
+							var objB = {};
+							objB.name = v.name;
+							var len = self.itemsBus.length;
+							if(len < 3) {
+								self.itemsBus.push(objB);
+							}
+							console.log(self.itemsBus);
+						} else {
+							var objP = {};
+							objP.name = v.name;
+							var len = self.itemsPlace.length;
+							if(len < 3) {
+								self.itemsPlace.push(objP);
+							}
+						}
+					})
+					if(!self.itemsBus.length) {
+						self.busMoreTip = false;
+					} else {
+						self.busMoreTip = true;
+					}
+					if(!self.itemsPlace.length) {
+						self.placeMoreTip = false;
+					} else {
+						self.placeMoreTip = true;
+					}
+				}).fail(function(error) {
+					alert('error');
+				});
+
+
+			},
+			bus_placeMore: function(ty) {
+				var content = $("#keyword").val();
+				mui.openWindow({
+					url: 'busMore.html',
+					id: 'busMore',
+					show: {
+						duration: 300
+					},
+					waiting: {
+						autoshow: false,
+						title: '正在加载...'
+					},
+					extras: {
+						name: content,
+						type: ty
+					}
+				})
+			},
+			placeMore: function() {
+
+			}
+		}
+	})
+</script>

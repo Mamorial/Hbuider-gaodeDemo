@@ -1,0 +1,135 @@
+<script src="js/head.js" type="text/javascript" charset="utf-8"></script>
+	<nav class="mui-bar mui-bar-tab">
+	    <a class="mui-tab-item mui-active" data-id="sub1">
+	        <span class="mui-icon mui-icon-home"></span>
+	        <span class="mui-tab-label">首页</span>
+	    </a>
+	    <a class="mui-tab-item" data-id="sub2">
+	        <span class="mui-icon mui-icon-phone"></span>
+	        <span class="mui-tab-label">定位</span>
+	    </a>
+	    <a class="mui-tab-item" data-id="sub3">
+	        <span class="mui-icon mui-icon-email"></span>
+	        <span class="mui-tab-label">邮件</span>
+	    </a>
+	    <a class="mui-tab-item" data-id="sub4">
+	        <span class="mui-icon mui-icon-gear"></span>
+	        <span class="mui-tab-label">设置</span>
+	    </a>
+	</nav>
+<script src="js/foot.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+//	$.get('192.168.0.115:8080/hello/', function(data) {
+//		console.log(data);
+//	})
+//	$.ajax({
+//		type:"get",
+//		url:"http://192.168.0.115:8080/hello/",
+//		async:true,
+//		success: function(data) {
+//			alert('success');
+//			console.log(data);
+//		},
+//		error: function() {
+//			alert('error');
+//		}
+//	});
+
+	fc.ajax('v3/traffic/status/rectangle?rectangle=116.351147,39.966309;116.357134,39.968727&key=e00e7ed74876f674fa2f01bf36f429c8', 'get').done(function(data) {
+		console.log(data);
+//		mui.toast(data.message);
+	}).fail(function(error) {
+		alert('error');
+	});
+	var map = new AMap.Map('', {
+        resizeEnable: true
+    });
+    map.plugin('AMap.Geolocation', function() {
+        geolocation = new AMap.Geolocation({
+            enableHighAccuracy: true,//是否使用高精度定位，默认:true
+            timeout: 10000,          //超过10秒后停止定位，默认：无穷大
+            buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+            zoomToAccuracy: true,      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+            buttonPosition:'RB'
+        });
+        map.addControl(geolocation);
+        geolocation.getCurrentPosition();
+        AMap.event.addListener(geolocation, 'complete', onComplete);//返回定位信息
+    });
+    function onComplete(data) {
+    	console.log('经度：' + data.position.getLng() + '纬度：' + data.position.getLat());
+    	var obj = {
+    		lng: data.position.getLng(),
+    		lat: data.position.getLat()
+    	};
+    	obj = JSON.stringify(obj);
+    	localStorage.setItem('nearState', obj);
+    }
+
+	mui.plusReady(function() {
+
+		var _path = "./pages/busHtmls/";
+
+		//判断手机是否已经开启GPS
+//		function getGEO_status(){
+//          var context = plus.android.importClass("android.content.Context");
+//          var locationManager=plus.android.importClass("android.location.LocationManager");
+//          var main=plus.android.runtimeMainActivity();
+//          var mainSvr=main.getSystemService(context.LOCATION_SERVICE);
+//          console.log(mainSvr.isProviderEnabled(locationManager.GPS_PROVIDER));
+//	        }
+//		getGEO_status();
+		var subInfos = [{
+			url: _path + 'sub1.html',
+			id: 'sub1'
+		},{
+			url: _path + 'sub2.html',
+			id: 'sub2'
+		},{
+			url: _path + 'sub3.html',
+			id: 'sub3'
+		},{
+			url: _path + 'sub4.html',
+			id: 'sub4'
+		}];
+	var subStyles = {
+		top: '0',
+		bottom: '51px'
+	};
+	var getSubInfoById = function(infoList, id) {
+		var result = null;
+		for(var i = 0, len = infoList.length; i < len; i++) {
+			var _info = infoList[i];
+			if(_info.id === id) {
+				result = _info;
+				break;
+			}
+		}
+		return result;
+	};
+	var mainWv = plus.webview.currentWebview();
+//	var titleEL = document.querySelector('.mui-title');
+	var activeTab = '';
+	var homeWv = plus.webview.create(subInfos[0].url, subInfos[0].id, subStyles);
+	mainWv.append(homeWv);
+	activeTab = subInfos[0].id;
+
+	mui('.mui-bar-tab').on('tap', 'a.mui-tab-item', function(e) {
+		var _self = this;
+		var targetTab = _self.getAttribute('data-id');
+		if(targetTab === activeTab) {
+			return;
+		}
+//		titleEL.innerHTML = _self.querySelector('.mui-tab-label').innerHTML;
+		var _subWv = plus.webview.getWebviewById(targetTab);
+		if(!_subWv) {
+			var _subInfo = getSubInfoById(subInfos, targetTab);
+			_subWv = plus.webview.create(_subInfo.url, _subInfo.id, subStyles);
+			mainWv.append(_subWv);
+		}
+		_subWv.show();
+		plus.webview.getWebviewById(activeTab).hide('none');
+		activeTab = targetTab;
+	})
+	})
+</script>

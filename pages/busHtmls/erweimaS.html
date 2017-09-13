@@ -1,0 +1,71 @@
+<script src="../../js/headHtml.js" type="text/javascript" charset="utf-8"></script>
+	<header class="mui-bar mui-bar-nav white">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">二维码扫描</h1>
+    </header>
+    <div class="mui-content">
+        <button id="startScan" class="mui-btn mui-btn-success">开始扫描</button>
+        <button id="cancelScan" class="mui-btn mui-btn-success">取消扫描</button>
+        <button id="setFlash" class="mui-btn mui-btn-success">开启/关闭闪光灯</button>
+        <div id= "bcid"></div>
+    </div>
+<script src="../../js/foot.js" type="text/javascript" charset="utf-8"></script>
+<style type="text/css">
+	#bcid {
+			height:460px;
+			width:320px;
+		}
+</style>
+<script>
+    mui.init({
+        swipeBack:true //启用右滑关闭功能
+    });
+    var scan = null;
+    var isOpen = false; // 闪光灯是否开始标志 true:闪光灯已经开启 false:闪光灯关闭
+    // 条码识别成功事件
+    function onmarked( type, result ) {
+        var text = '未知: ';
+        switch(type){
+            case plus.barcode.QR:
+            text = 'QR: '; // 二维码
+            break;
+            case plus.barcode.EAN13:
+            text = 'EAN13: ';
+            break;
+            case plus.barcode.EAN8:
+            text = 'EAN8: ';
+            break;
+        }
+        ak(result);
+//      alert( text+result );
+    }
+    function ak(url) {
+    	alert(url);
+    	plus.runtime.openURL(url);
+    }
+    // 创建扫描控件
+    function startRecognize() {
+        scan = new plus.barcode.Barcode('bcid');
+        scan.onmarked = onmarked;
+    }
+    // 开始扫描
+    document.getElementById("startScan").addEventListener('tap',function(){
+        startRecognize();
+        scan.start();
+    })
+    // 取消扫描
+    document.getElementById("cancelScan").addEventListener('tap',function(){
+        startRecognize();
+        scan.cancel();
+    })
+    //  开启和关闭闪光灯
+    document.getElementById("setFlash").addEventListener('tap',function(){
+        startRecognize();
+        isOpen = !isOpen;
+        if(isOpen){
+            scan.setFlash(true);
+        }else{
+            scan.setFlash(false);
+        }
+    })
+</script>
