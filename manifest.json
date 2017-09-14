@@ -301,7 +301,14 @@
 			"pages/busHtmls/sub2.html": {
 				"resources": [
 					"css/mui.min.css",
-					"js/babel.js"
+					"js/babel.js",
+					"js/common.js",
+					"js/mui.min.js",
+					"js/jquery-1.11.1.js",
+					"js/vue2.0.js",
+					"js/jquery.qrcode.min.js",
+					"js/foot.js",
+					"js/headHtml.js"
 				],
 				"refer": [],
 				"priority": 0
@@ -322,33 +329,54 @@
 				],
 				"refer": [
 					"pages/busHtmls/busRoute.html",
-					"pages/busHtmls/busMore.html"
+					"pages/busHtmls/busMore.html",
+					"pages/busHtmls/stationInfo.html"
 				],
 				"priority": 0
 			},
 			"pages/busHtmls/busMore.html": {
 				"resources": [
 					"css/mui.min.css",
-					"js/babel.js"
+					"js/babel.js",
+					"js/jquery-1.11.1.js",
+					"js/vue2.0.js",
+					"js/common.js",
+					"js/mui.min.js",
+					"js/jquery.qrcode.min.js",
+					"js/foot.js",
+					"js/headHtml.js"
 				],
 				"refer": [
-					"pages/busHtmls/busMap.html"
+					"pages/busHtmls/busMap.html",
+					"pages/busHtmls/sub3.html"
 				],
 				"priority": 0
 			},
 			"pages/busHtmls/busRoute.html": {
 				"resources": [
-					"css/mui.min.css"
+					"css/mui.min.css",
+					"js/jquery-1.11.1.js",
+					"js/vue2.0.js",
+					"js/babel.js",
+					"js/common.js",
+					"js/mui.min.js",
+					"js/jquery.qrcode.min.js",
+					"js/foot.js",
+					"js/headHtml.js"
 				],
 				"refer": [
-					"pages/busHtmls/busMap.html"
+					"pages/busHtmls/busMap.html",
+					"pages/busHtmls/sub3.html"
 				],
 				"priority": 0
 			},
 			"pages/busHtmls/busMap.html": {
 				"resources": [
 					"css/mui.min.css",
-					"js/babel.js"
+					"js/babel.js",
+					"js/jquery-1.11.1.js",
+					"js/vue2.0.js",
+					"js/mui.min.js"
 				],
 				"refer": [],
 				"priority": 0
@@ -461,6 +489,38 @@
 					"js/headHtml.js"
 				],
 				"refer": [],
+				"priority": 0
+			},
+			"pages/busHtmls/sub4.html": {
+				"resources": [
+					"css/mui.min.css",
+					"js/common.js",
+					"js/mui.min.js",
+					"js/jquery-1.11.1.js",
+					"js/vue2.0.js",
+					"js/jquery.qrcode.min.js",
+					"js/foot.js",
+					"js/babel.js",
+					"js/headHtml.js"
+				],
+				"refer": [],
+				"priority": 0
+			},
+			"pages/busHtmls/stationInfo.html": {
+				"resources": [
+					"css/mui.min.css",
+					"js/common.js",
+					"js/mui.min.js",
+					"js/jquery-1.11.1.js",
+					"js/vue2.0.js",
+					"js/jquery.qrcode.min.js",
+					"js/foot.js",
+					"js/babel.js",
+					"js/headHtml.js"
+				],
+				"refer": [
+					"pages/busHtmls/busMap.html"
+				],
 				"priority": 0
 			}
 		},

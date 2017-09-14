@@ -1,10 +1,113 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="UTF-8">
-		<title></title>
-	</head>
-	<body>
-		<h1>this is sub4 page</h1>
-	</body>
-</html>
+<script src="../../js/headHtml.js" type="text/javascript" charset="utf-8"></script>
+
+	<div id="bg">
+		<div id="content">
+			<div style="width: 70%;height: 200px;border: 1px solid red;margin: 100px auto;position: relative;">
+				<div class="mui-content">
+					<div class="mui-content-padded">
+						<div class="mui-input-row mui-input-range field-contain">
+				            <div style="float:left">
+				                200
+				            </div>
+				            <div style="float: left;">
+				                <input type="range" id='field-range' value="60" min="0" max="100" />
+				            </div>
+				            <div style="float:left">
+				                2000
+				            </div>
+				        </div>
+					</div>
+				</div>
+				<div class="mui-button-row" style="position: absolute;bottom: 0;border: 1px solid red;margin: auto;width: 100%;text-align: center;">
+					<button class="mui-btn-primary cancel">取消</button>
+					<button class="mui-btn-primary confirm">确定</button>
+				</div>
+			</div>
+			<!--<div class="mui-content">
+		    <div class="mui-content-padded">
+		        <h5 style='margin-top:35px;'>label+输入框+滑块：</h5>
+		        <div class="mui-input-row mui-input-range field-contain">
+		            <div style="float:left">
+		                <label >滑块：</label>
+		                <input type="text" id='field-range-input' value='60'>
+		            </div>
+		            <div style="margin-left:121px;">
+		                <input type="range" id='field-range' value="60" min="0" max="100" />
+		            </div>
+		        </div>
+		        <h5>label+滑块：<span id='inline-range-val'>20</span></h5>
+		        <div class="mui-input-row mui-input-range">
+		            <label>滑块：</label>
+		            <input type="range" id='inline-range' value="20" min="0" max="100" >
+		        </div>
+
+		        <h5 style="clear: left;">整行滑块：<span id='block-range-val'>50</span></h5>
+		        <div class="mui-input-row mui-input-range">
+		            <input type="range" id='block-range' value="50" min="0" max="100" >
+		        </div>
+		    </div>
+		</div>-->
+		</div>
+	</div>
+	<button class="btn1">打开</button>
+	<button class="btn2">关闭</button>
+<script src="../../js/foot.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	$(function() {
+		$(".btn1").click(function() {
+			$("#content").fadeIn(200);$("#bg").fadeIn(200);
+		});
+		$(".confirm").click(function() {
+			$("#content").fadeOut(200);$("#bg").fadeOut(200);
+		});
+		$(".cancel").click(function() {
+			$("#content").fadeOut(200);$("#bg").fadeOut(200);
+		});
+	})
+</script>
+<script>
+		mui.init({
+				swipeBack:true //启用右滑关闭功能
+			});
+	    //监听input事件，获取range的value值，也可以直接element.value获取该range的值
+	    var rangeList = document.querySelectorAll('input[type="range"]');
+	    for(var i=0,len=rangeList.length;i<len;i++){
+	        rangeList[i].addEventListener('input',function(){
+	            if(this.id.indexOf('field')>=0){
+	                document.getElementById(this.id+'-input').value = this.value;
+	            }else{
+	                document.getElementById(this.id+'-val').innerHTML = this.value;
+	            }
+
+
+	        });
+	    }
+
+	    document.getElementById('field-range-input').addEventListener('input',function(){
+	        document.getElementById('field-range').value = this.value;
+	    });
+	</script>
+<style type="text/css">
+	#bg{
+		position:fixed;z-index:2;background-color:#000;opacity:0.7;top:0;left:0;width:100%;height:100%;display:none;
+	}
+	#content{
+		postion:fixed;display:none;z-index:999;background-color:#fff;margin-top: 100px auto;width: 100%;
+	}
+	h5{
+		        padding-top: 15px;
+		    }
+
+		    .field-contain label{
+		        width: auto;
+		        padding-right: 0;
+		    }
+
+		    .field-contain input[type='text']{
+		        width: 40px;
+		        height: 30px;
+		        padding: 5px 0;
+		        float: none;
+		        text-align: center;
+		    }
+</style>

@@ -8,26 +8,43 @@
 		</header>
 		<div class="mui-content">
 			<div class="mui-content-businfo" v-if="busInfoshow">
-				<div class="title">
-					线路
+				<div v-if="busMoreTipDiv">
+					<div class="title">
+						线路
+					</div>
+					<ul class="mui-table-view">
+						 <li class="mui-table-view-cell" v-for="item in itemsBus" @click="busNumInfo(item.name)">
+						 	<span class="mui-icon mui-icon-location"></span>
+						 	{{item.name}}
+						 </li>
+						 <li class="mui-table-view-cell" @click="bus_placeMore('bus')">{{busMoreTip?'查看更多':'无'}}</li>
+					</ul>
 				</div>
-				<ul class="mui-table-view">
-					 <li class="mui-table-view-cell" v-for="item in itemsBus" @click="busNumInfo(item.name)">
-					 	<span class="mui-icon mui-icon-location"></span>
-					 	{{item.name}}
-					 </li>
-					 <li class="mui-table-view-cell" @click="bus_placeMore('bus')">{{busMoreTip?'查看更多':'无'}}</li>
-				</ul>
-				<div class="title">
-					地方
+				<div v-if="stationMoreTipDiv">
+					<div class="title">
+						站牌
+					</div>
+					<ul class="mui-table-view">
+						 <li class="mui-table-view-cell" v-for="item in itemsStations" @click="stationNumInfo(item.name)">
+						 	<span class="mui-icon mui-icon-location"></span>
+						 	{{item.name}}
+						 </li>
+						 <li class="mui-table-view-cell" @click="bus_placeMore('station')">{{stationMoreTip?'查看更多':'无'}}</li>
+					</ul>
 				</div>
-				<ul class="mui-table-view">
-					 <li class="mui-table-view-cell" v-for="item in itemsPlace" @click="busNumInfo(item.name)">
-					 	<span class="mui-icon mui-icon-location"></span>
-					 	{{item.name}}
-					 </li>
-					 <li class="mui-table-view-cell" @click="bus_placeMore('place')">{{placeMoreTip?'查看更多':'无'}}</li>
-				</ul>
+				<div v-if="placeMoreTipDiv">
+					<div class="title">
+						线路规划
+					</div>
+					<ul class="mui-table-view">
+						 <li class="mui-table-view-cell" v-for="item in itemsPlace" @click="placeNumInfo(item.name)">
+						 	<span class="mui-icon mui-icon-location"></span>
+						 	{{item.name}}
+						 </li>
+						 <li class="mui-table-view-cell" @click="bus_placeMore('place')">{{placeMoreTip?'查看更多':'无'}}</li>
+					</ul>
+				</div>
+
 			</div>
 			<div class="mui-content-noinfo" v-else>
 				可以搜索公交
@@ -48,10 +65,15 @@
 		el: '#busNum',
 		data: {
 			itemsBus: [],
+			itemsStations: [],
 			itemsPlace: [],
 			search_input: '',
 			busMoreTip: true,
+			stationMoreTip: true,
 			placeMoreTip: true,
+			busMoreTipDiv: false,
+			stationMoreTipDiv: false,
+			placeMoreTipDiv: false,
 			busInfoshow: false,
 			nativeWebview: '',
 			imm: '',
@@ -70,6 +92,7 @@
 			});
 		},
 		methods: {
+			//公交详情
 			busNumInfo: function(bus) {
 				mui.openWindow({
 					url: 'busRoute.html',
@@ -85,6 +108,27 @@
 						name: bus
 					}
 				})
+			},
+			//站台详情
+			stationNumInfo: function(station) {
+				mui.openWindow({
+					url: 'stationInfo.html',
+					id: 'stationInfo',
+					show: {
+						duration: 300
+					},
+					waiting: {
+						autoshow: false,
+						title: '正在加载...'
+					},
+					extras: {
+						name: station
+					}
+				})
+			},
+			//路线规划详情
+			placeNumInfo: function() {
+
 			},
 			initNativeObjects: function() {   //调起手机键盘
 				var self = this;
@@ -116,50 +160,95 @@
 				var self = this,
 					keywords = self.search_input,
 					_url;
-				_url = "v3/assistant/inputtips?key=e00e7ed74876f674fa2f01bf36f429c8&keywords="+keywords+"&city=宁波&datatype=all&citylimit=true";
+				_url1 = "v3/assistant/inputtips?key=e00e7ed74876f674fa2f01bf36f429c8&keywords="+keywords+"&city=宁波&datatype=busline&citylimit=true";
+				_url2 = "v3/assistant/inputtips?key=e00e7ed74876f674fa2f01bf36f429c8&keywords="+keywords+"&city=宁波&datatype=bus&citylimit=true";
+				_url3 = "v3/assistant/inputtips?key=e00e7ed74876f674fa2f01bf36f429c8&keywords="+keywords+"&city=宁波&datatype=poi&citylimit=true";
 				if(!keywords) {
 					self.busInfoshow = false;
 				} else {
 					self.busInfoshow = true;
 				}
 				self.itemsBus = [];
+				self.itemsStations = [];
 				self.itemsPlace = [];
-				fc.ajax(_url, 'get').done(function(data) {
+				//公交查询
+				fc.ajax(_url1, 'get').done(function(data) {
 					console.log(data.tips.length);
 					data.tips.forEach(function(v, i, a) {
-						if(v.typecode == "999901" || v.typecode == "999905") {
-							var objB = {};
+						//公交信息
+						var objB = {};
 							objB.name = v.name;
 							var len = self.itemsBus.length;
 							if(len < 3) {
 								self.itemsBus.push(objB);
 							}
-							console.log(self.itemsBus);
-						} else {
-							var objP = {};
-							objP.name = v.name;
-							var len = self.itemsPlace.length;
-							if(len < 3) {
-								self.itemsPlace.push(objP);
-							}
+					})
+					self.typeListShow();
+				}).fail(function(error) {
+					alert('error');
+				});
+				//站点查询
+				fc.ajax(_url2, 'get').done(function(data) {
+					console.log(data.tips.length);
+					data.tips.forEach(function(v, i, a) {
+						//公交信息
+						var objS = {};
+						objS.name = v.name;
+						var len = self.itemsStations.length;
+						if(len < 3) {
+							self.itemsStations.push(objS);
 						}
 					})
-					if(!self.itemsBus.length) {
-						self.busMoreTip = false;
-					} else {
-						self.busMoreTip = true;
-					}
-					if(!self.itemsPlace.length) {
-						self.placeMoreTip = false;
-					} else {
-						self.placeMoreTip = true;
-					}
+					self.typeListShow();
+				}).fail(function(error) {
+					alert('error');
+				});
+				//地名查询
+				fc.ajax(_url3, 'get').done(function(data) {
+					console.log(data.tips.length);
+					data.tips.forEach(function(v, i, a) {
+						//公交信息
+						var objP = {};
+						objP.name = v.name;
+						var len = self.itemsPlace.length;
+						if(len < 3) {
+							self.itemsPlace.push(objP);
+						}
+					});
+					self.typeListShow();
+
 				}).fail(function(error) {
 					alert('error');
 				});
 
 
 			},
+			//公交、站牌、地名是否显示
+			typeListShow: function() {
+				var self = this;
+				if(!self.itemsBus.length) {
+					self.busMoreTip = false;
+					self.busMoreTipDiv = false;
+				} else {
+					self.busMoreTip = true;
+					self.busMoreTipDiv = true;
+				}
+				if(!self.itemsStations.length) {
+					self.stationMoreTip = false;
+					self.stationMoreTipDiv = false;
+				} else {
+					self.stationMoreTip = true;
+					self.stationMoreTipDiv = true;
+				}
+				if(!self.itemsPlace.length) {
+					self.placeMoreTip = false;
+					self.placeMoreTipDiv = false;
+				} else {
+					self.placeMoreTip = true;
+					self.placeMoreTipDiv = true;
+				}
+			},
+			//更多
 			bus_placeMore: function(ty) {
 				var content = $("#keyword").val();
 				mui.openWindow({
@@ -177,9 +266,6 @@
 						type: ty
 					}
 				})
-			},
-			placeMore: function() {
-
 			}
 		}
 	})

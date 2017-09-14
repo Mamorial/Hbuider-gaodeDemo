@@ -43,8 +43,8 @@
 		methods: {
 			busNumInfo: function(name) {
 				mui.openWindow({
-					url: 'busMap.html',
-					id: 'busMap',
+					url: 'sub3.html',
+					id: 'sub3',
 					show: {
 						duration: 300
 					},
@@ -61,8 +61,10 @@
 				var _type;
 				if(type == 'bus') {
 					_type = 'busline';
+				} else if(type == 'station') {
+					_type = 'bus'
 				} else {
-					type = 'poi';
+					_type = 'poi';
 				}
 				var self = this,
 					keywords = self.searchMore,
